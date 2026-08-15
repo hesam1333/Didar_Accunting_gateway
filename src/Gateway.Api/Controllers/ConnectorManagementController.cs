@@ -1,3 +1,4 @@
+using Gateway.Api.Filters;
 using Gateway.Application.Dtos.Connectors;
 using Gateway.Application.Exceptions;
 using Gateway.Application.Services.Abstractions;
@@ -7,6 +8,7 @@ namespace Gateway.Api.Controllers;
 
 [ApiController]
 [Route("api/connectors")]
+[ServiceFilter(typeof(ConnectorManagementSecretFilter))]
 public class ConnectorManagementController : ControllerBase
 {
     private readonly IConnectorManagementService _connectorManagementService;
