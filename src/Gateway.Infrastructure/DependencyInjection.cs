@@ -18,6 +18,7 @@ public static class DependencyInjection
 
         services.AddScoped<IConnectorRepository, ConnectorRepository>();
         services.AddScoped<ICredentialEncryptionService, CredentialEncryptionService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;
     }
