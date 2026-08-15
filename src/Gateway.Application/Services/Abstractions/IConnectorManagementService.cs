@@ -10,6 +10,8 @@ public interface IConnectorManagementService
 
     Task<ConnectorListResultDto> ListAsync(int page, int pageSize, CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<ConnectorDto>> ListByBizDomainIdAsync(Guid bizDomainId, CancellationToken cancellationToken);
+
     Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken);
 
     Task<ConnectorDto> RotateAgentSecretAsync(Guid id, CancellationToken cancellationToken);

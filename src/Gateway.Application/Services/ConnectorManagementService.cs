@@ -70,6 +70,15 @@ public class ConnectorManagementService : IConnectorManagementService
         return new ConnectorListResultDto(items, totalCount, page, pageSize);
     }
 
+    public async Task<IReadOnlyList<ConnectorDto>> ListByBizDomainIdAsync(Guid bizDomainId, CancellationToken cancellationToken)
+    {
+        var connectors = await _connectorRepository.GetByBizDomainIdAsync(bizDomainId, cancellationToken);
+
+        return connectors
+            .Select(connector => ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector)))
+            .ToList();
+    }
+
     public async Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken)
     {
         var connector = await GetRequiredConnectorAsync(id, cancellationToken);

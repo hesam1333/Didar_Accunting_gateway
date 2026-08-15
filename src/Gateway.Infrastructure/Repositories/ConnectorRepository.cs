@@ -35,6 +35,15 @@ public class ConnectorRepository : IConnectorRepository
                 cancellationToken);
     }
 
+    public async Task<List<Connector>> GetByBizDomainIdAsync(Guid bizDomainId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Connectors
+            .AsNoTracking()
+            .Where(connector => connector.BizDomainId == bizDomainId)
+            .OrderBy(connector => connector.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<(List<Connector> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
         var totalCount = await _dbContext.Connectors.CountAsync(cancellationToken);

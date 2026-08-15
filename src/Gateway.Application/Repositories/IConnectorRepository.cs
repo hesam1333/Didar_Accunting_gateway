@@ -11,6 +11,8 @@ public interface IConnectorRepository
 
     Task<Connector?> GetByBizDomainIdAndProviderAsync(Guid bizDomainId, ProviderType provider, CancellationToken cancellationToken);
 
+    Task<List<Connector>> GetByBizDomainIdAsync(Guid bizDomainId, CancellationToken cancellationToken);
+
     Task<(List<Connector> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken);
 
     Task AddAsync(Connector connector, CancellationToken cancellationToken);
