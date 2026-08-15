@@ -1,0 +1,14 @@
+using Gateway.Domain.Enums;
+
+namespace Gateway.Application.Dtos.Connectors;
+
+public record ConnectorDto(
+    Guid Id,
+    Guid BizDomainId,
+    ProviderType Provider,
+    string ApiKey,
+    string LoginToken,
+    string AgentSecret,
+    bool IsActive,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? LastAgentSeenAt);

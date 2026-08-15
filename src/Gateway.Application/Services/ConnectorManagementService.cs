@@ -1,0 +1,147 @@
+using System.Security.Cryptography;
+using Gateway.Application.Dtos.Connectors;
+using Gateway.Application.Exceptions;
+using Gateway.Application.Repositories;
+using Gateway.Application.Services.Abstractions;
+using Gateway.Domain.Entities;
+
+namespace Gateway.Application.Services;
+
+public class ConnectorManagementService : IConnectorManagementService
+{
+    private readonly IConnectorRepository _connectorRepository;
+    private readonly ICredentialEncryptionService _credentialEncryptionService;
+
+    public ConnectorManagementService(
+        IConnectorRepository connectorRepository,
+        ICredentialEncryptionService credentialEncryptionService)
+    {
+        _connectorRepository = connectorRepository;
+        _credentialEncryptionService = credentialEncryptionService;
+    }
+
+    public async Task<ConnectorDto> CreateAsync(CreateConnectorDto request, CancellationToken cancellationToken)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var loginToken = GenerateSecret("lt_");
+        var agentSecret = GenerateSecret("as_");
+
+        var connector = new Connector
+        {
+            Id = Guid.NewGuid(),
+            BizDomainId = request.BizDomainId,
+            Provider = request.Provider,
+            ApiKey = GenerateSecret("ak_"),
+            LoginTokenEncrypted = _credentialEncryptionService.Encrypt(loginToken),
+            AgentSecretEncrypted = _credentialEncryptionService.Encrypt(agentSecret),
+            IsActive = true,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        await _connectorRepository.AddAsync(connector, cancellationToken);
+
+        return ToDto(connector, loginToken, agentSecret);
+    }
+
+    public async Task<ConnectorDto> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+
+        return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
+    }
+
+    public async Task<IReadOnlyList<ConnectorDto>> ListAsync(CancellationToken cancellationToken)
+    {
+        var connectors = await _connectorRepository.GetAllAsync(cancellationToken);
+
+        return connectors
+            .Select(connector => ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector)))
+            .ToList();
+    }
+
+    public async Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+        var loginToken = GenerateSecret("lt_");
+
+        connector.LoginTokenEncrypted = _credentialEncryptionService.Encrypt(loginToken);
+        connector.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _connectorRepository.UpdateAsync(connector, cancellationToken);
+
+        return ToDto(connector, loginToken, DecryptAgentSecret(connector));
+    }
+
+    public async Task<ConnectorDto> RotateAgentSecretAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+        var agentSecret = GenerateSecret("as_");
+
+        connector.AgentSecretEncrypted = _credentialEncryptionService.Encrypt(agentSecret);
+        connector.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _connectorRepository.UpdateAsync(connector, cancellationToken);
+
+        return ToDto(connector, DecryptLoginToken(connector), agentSecret);
+    }
+
+    public async Task<ConnectorDto> EnableAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+
+        connector.IsActive = true;
+        connector.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _connectorRepository.UpdateAsync(connector, cancellationToken);
+
+        return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
+    }
+
+    public async Task<ConnectorDto> DisableAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+
+        connector.IsActive = false;
+        connector.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _connectorRepository.UpdateAsync(connector, cancellationToken);
+
+        return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
+    }
+
+    private async Task<Connector> GetRequiredConnectorAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _connectorRepository.GetByIdAsync(id, cancellationToken)
+            ?? throw new ConnectorNotFoundException(id);
+    }
+
+    private string DecryptLoginToken(Connector connector)
+    {
+        return _credentialEncryptionService.Decrypt(connector.LoginTokenEncrypted);
+    }
+
+    private string DecryptAgentSecret(Connector connector)
+    {
+        return _credentialEncryptionService.Decrypt(connector.AgentSecretEncrypted);
+    }
+
+    private static ConnectorDto ToDto(Connector connector, string loginToken, string agentSecret)
+    {
+        return new ConnectorDto(
+            connector.Id,
+            connector.BizDomainId,
+            connector.Provider,
+            connector.ApiKey,
+            loginToken,
+            agentSecret,
+            connector.IsActive,
+            connector.CreatedAt,
+            connector.LastAgentSeenAt);
+    }
+
+    private static string GenerateSecret(string prefix)
+    {
+        return prefix + Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
+    }
+}
