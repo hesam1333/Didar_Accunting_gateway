@@ -8,7 +8,7 @@ public interface IConnectorManagementService
 
     Task<ConnectorDto> GetAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<ConnectorDto>> ListAsync(CancellationToken cancellationToken);
+    Task<ConnectorListResultDto> ListAsync(int page, int pageSize, CancellationToken cancellationToken);
 
     Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken);
 

@@ -27,6 +27,8 @@ public class ConnectorEntityTypeConfiguration : IEntityTypeConfiguration<Connect
 
         builder.HasIndex(connector => connector.ApiKey).IsUnique();
 
+        builder.HasIndex(connector => new { connector.BizDomainId, connector.Provider }).IsUnique();
+
         builder.Property(connector => connector.LoginTokenEncrypted)
             .HasMaxLength(500)
             .IsRequired();

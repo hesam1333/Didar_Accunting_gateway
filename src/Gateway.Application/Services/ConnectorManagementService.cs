@@ -22,6 +22,14 @@ public class ConnectorManagementService : IConnectorManagementService
 
     public async Task<ConnectorDto> CreateAsync(CreateConnectorDto request, CancellationToken cancellationToken)
     {
+        var existing = await _connectorRepository
+            .GetByBizDomainIdAndProviderAsync(request.BizDomainId, request.Provider, cancellationToken);
+
+        if (existing is not null)
+        {
+            throw new ConnectorAlreadyExistsException(request.BizDomainId, request.Provider);
+        }
+
         var now = DateTimeOffset.UtcNow;
         var loginToken = GenerateSecret("lt_");
         var agentSecret = GenerateSecret("as_");
@@ -51,13 +59,15 @@ public class ConnectorManagementService : IConnectorManagementService
         return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
     }
 
-    public async Task<IReadOnlyList<ConnectorDto>> ListAsync(CancellationToken cancellationToken)
+    public async Task<ConnectorListResultDto> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        var connectors = await _connectorRepository.GetAllAsync(cancellationToken);
+        var (connectors, totalCount) = await _connectorRepository.GetPagedAsync(page, pageSize, cancellationToken);
 
-        return connectors
+        var items = connectors
             .Select(connector => ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector)))
             .ToList();
+
+        return new ConnectorListResultDto(items, totalCount, page, pageSize);
     }
 
     public async Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken)

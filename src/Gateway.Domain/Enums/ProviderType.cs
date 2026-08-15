@@ -2,7 +2,7 @@ namespace Gateway.Domain.Enums;
 
 public enum ProviderType
 {
-    Holoo,
-    Mahak,
-    Sepidar
+    Holoo = 1,
+    Mahak = 2,
+    Sepidar = 3
 }

@@ -1,5 +1,6 @@
 using Gateway.Application.Repositories;
 using Gateway.Domain.Entities;
+using Gateway.Domain.Enums;
 using Gateway.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,11 +27,26 @@ public class ConnectorRepository : IConnectorRepository
             .FirstOrDefaultAsync(connector => connector.ApiKey == apiKey, cancellationToken);
     }
 
-    public async Task<List<Connector>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<Connector?> GetByBizDomainIdAndProviderAsync(Guid bizDomainId, ProviderType provider, CancellationToken cancellationToken)
     {
         return await _dbContext.Connectors
+            .FirstOrDefaultAsync(
+                connector => connector.BizDomainId == bizDomainId && connector.Provider == provider,
+                cancellationToken);
+    }
+
+    public async Task<(List<Connector> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var totalCount = await _dbContext.Connectors.CountAsync(cancellationToken);
+
+        var items = await _dbContext.Connectors
             .AsNoTracking()
+            .OrderBy(connector => connector.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task AddAsync(Connector connector, CancellationToken cancellationToken)
