@@ -1,0 +1,26 @@
+namespace Gateway.Application.Dtos.Accounting;
+
+public record ItemDto(
+    int Id,
+    string Code,
+    string Name,
+    int ItemType,
+    string Unit,
+    string SubUnit,
+    double ConversionFactor,
+    string Barcode,
+    double Stock,
+    decimal BuyPrice,
+    decimal SellPrice,
+    string PurchasesTitle,
+    string SalesTitle,
+    int NodeId,
+    string NodeName,
+    string NodeFamily,
+    string Tag,
+    string Description,
+    string ProductCode,
+    bool Active,
+    string TaxId,
+    string TaxUnit,
+    object? PriceList);
