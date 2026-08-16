@@ -1,5 +1,5 @@
-using Gateway.Api.Filters;
 using Gateway.Application.Dtos.Connectors;
+using Gateway.Infrastructure.Authentication;
 using Gateway.Application.Exceptions;
 using Gateway.Application.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;

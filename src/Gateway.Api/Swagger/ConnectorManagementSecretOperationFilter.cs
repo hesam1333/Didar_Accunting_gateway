@@ -1,4 +1,4 @@
-using Gateway.Api.Filters;
+using Gateway.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;

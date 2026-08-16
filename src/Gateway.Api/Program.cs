@@ -1,28 +1,15 @@
-using Gateway.Api.Filters;
-using Gateway.Api.Swagger;
+using Gateway.Api;
 using Gateway.Application;
 using Gateway.Infrastructure;
-using Microsoft.OpenApi.Models;
+using Gateway.Infrastructure.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<ConnectorManagementSecretFilter>();
+builder.Services.AddAuthorization();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("ConnectorManagementSecret", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.ApiKey,
-        Name = "auth-con-manager",
-        In = ParameterLocation.Header,
-        Description = "Connector management secret required for connector management endpoints."
-    });
-
-    options.OperationFilter<ConnectorManagementSecretOperationFilter>();
-});
+builder.Services.AddSwagger();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -37,6 +24,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+app.MapHub<AgentHub>("/hubs/accounting-agent");
 
 app.Run();

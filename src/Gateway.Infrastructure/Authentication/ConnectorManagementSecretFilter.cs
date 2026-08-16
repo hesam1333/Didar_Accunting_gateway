@@ -1,9 +1,11 @@
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
 
-namespace Gateway.Api.Filters;
+namespace Gateway.Infrastructure.Authentication;
 
 public class ConnectorManagementSecretFilter : IAuthorizationFilter
 {
