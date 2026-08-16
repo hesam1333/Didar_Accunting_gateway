@@ -1,9 +1,9 @@
 using Gateway.Domain.Enums;
-using Gateway.Application.Dtos.Accounting;
+using Gateway.Application.Dtos.Accounting.Requests;
 
 namespace Gateway.Application.Commands;
 
-public sealed record SaveInvoiceCommand(InvoiceDto Invoice) : Command
+public sealed record SaveInvoiceCommand(InvoiceRequestDto Invoice) : Command
 {
     public override CommandType CommandType => CommandType.SaveInvoice;
 }

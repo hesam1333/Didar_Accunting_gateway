@@ -1,5 +1,5 @@
 using Gateway.Domain.Enums;
-using Gateway.Application.Dtos.Accounting;
+using Gateway.Application.Dtos.Accounting.Requests;
 
 namespace Gateway.Application.Commands;
 
