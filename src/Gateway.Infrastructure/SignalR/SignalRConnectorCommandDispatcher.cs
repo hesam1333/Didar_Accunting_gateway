@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Gateway.Application.Commands;
 using Gateway.Application.Exceptions;
 using Gateway.Application.Services.Abstractions;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 
 namespace Gateway.Infrastructure.SignalR;
 
@@ -10,20 +12,26 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
     private readonly IHubContext<AgentHub> _hubContext;
     private readonly ConnectorConnectionRegistry _connectionRegistry;
     private readonly PendingCommandRegistry _pendingCommandRegistry;
-
-    public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _commandTimeout;
 
     public SignalRConnectorCommandDispatcher(
         IHubContext<AgentHub> hubContext,
         ConnectorConnectionRegistry connectionRegistry,
-        PendingCommandRegistry pendingCommandRegistry)
+        PendingCommandRegistry pendingCommandRegistry,
+        IConfiguration configuration)
     {
         _hubContext = hubContext;
         _connectionRegistry = connectionRegistry;
         _pendingCommandRegistry = pendingCommandRegistry;
+
+        var timeoutSeconds = int.TryParse(configuration["SignalR:CommandTimeoutSeconds"], out var seconds)
+            ? seconds
+            : 30;
+
+        _commandTimeout = TimeSpan.FromSeconds(timeoutSeconds);
     }
 
-    public async Task<CommandResult<object>> DispatchAsync(
+    public async Task<CommandResult<TData>> DispatchAsync<TData>(
         Guid connectorId,
         Command command,
         CancellationToken cancellationToken)
@@ -43,7 +51,7 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
                 command.CommandType,
                 command);
 
-            using var timeoutCts = new CancellationTokenSource(CommandTimeout);
+            using var timeoutCts = new CancellationTokenSource(_commandTimeout);
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
             try
@@ -53,7 +61,7 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
             }
             catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
             {
-                throw CommandDispatchException.Timeout(connectorId, CommandTimeout);
+                throw CommandDispatchException.Timeout(connectorId, _commandTimeout);
             }
             catch (OperationCanceledException)
             {
@@ -71,20 +79,20 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
             }
             catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
             {
-                throw CommandDispatchException.Timeout(connectorId, CommandTimeout);
+                throw CommandDispatchException.Timeout(connectorId, _commandTimeout);
             }
             catch (OperationCanceledException)
             {
                 throw;
             }
 
-            return new CommandResult<object>
+            return new CommandResult<TData>
             {
                 CommandId = result.CommandId,
                 Success = result.Success,
                 ErrorCode = result.ErrorCode,
                 ErrorMessage = result.ErrorMessage,
-                Data = result.Data
+                Data = DeserializeData<TData>(result.Data)
             };
         }
         catch
@@ -92,5 +100,25 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
             _pendingCommandRegistry.TryCancel(command.CommandId);
             throw;
         }
+    }
+
+    private static TData? DeserializeData<TData>(object? data)
+    {
+        if (data is null)
+        {
+            return default;
+        }
+
+        if (data is TData typed)
+        {
+            return typed;
+        }
+
+        if (data is JsonElement element)
+        {
+            return element.Deserialize<TData>();
+        }
+
+        return (TData)data;
     }
 }
