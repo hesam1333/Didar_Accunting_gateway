@@ -1,4 +1,6 @@
 using System.Security.Cryptography;
+using System.Text;
+using Gateway.Application.Dtos.Accounting.Requests;
 using Gateway.Application.Dtos.Connectors;
 using Gateway.Application.Exceptions;
 using Gateway.Application.Repositories;
@@ -18,6 +20,35 @@ public class ConnectorManagementService : IConnectorManagementService
     {
         _connectorRepository = connectorRepository;
         _credentialEncryptionService = credentialEncryptionService;
+    }
+
+    public async Task<Guid> AuthenticateAsync(AccountingRequestBase request, CancellationToken cancellationToken)
+    {
+        var connector = await _connectorRepository.GetByApiKeyAsync(request.ApiKey, cancellationToken);
+
+        if (connector is null)
+        {
+            throw new InvalidConnectorCredentialsException();
+        }
+
+        if (!connector.IsActive)
+        {
+            throw new InvalidConnectorCredentialsException("The connector is disabled.");
+        }
+
+        if (connector.BizDomainId != request.BizDomainId)
+        {
+            throw new InvalidConnectorCredentialsException();
+        }
+
+        var expectedLoginToken = _credentialEncryptionService.Decrypt(connector.LoginTokenEncrypted);
+
+        if (!SecretsMatch(request.LoginToken, expectedLoginToken))
+        {
+            throw new InvalidConnectorCredentialsException();
+        }
+
+        return connector.Id;
     }
 
     public async Task<ConnectorDto> CreateAsync(CreateConnectorDto request, CancellationToken cancellationToken)
@@ -162,5 +193,14 @@ public class ConnectorManagementService : IConnectorManagementService
     private static string GenerateSecret(string prefix)
     {
         return prefix + Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
+    }
+
+    private static bool SecretsMatch(string actual, string expected)
+    {
+        var actualBytes = Encoding.UTF8.GetBytes(actual);
+        var expectedBytes = Encoding.UTF8.GetBytes(expected);
+
+        return actualBytes.Length == expectedBytes.Length
+            && CryptographicOperations.FixedTimeEquals(actualBytes, expectedBytes);
     }
 }
