@@ -1,5 +1,3 @@
-using Gateway.Domain.Enums;
-
 namespace Gateway.Domain.Entities;
 
 public class Connector
@@ -7,8 +5,6 @@ public class Connector
     public Guid Id { get; set; }
 
     public Guid BizDomainId { get; set; } 
-
-    public ProviderType Provider { get; set; }
 
     public string ApiKey { get; set; } = string.Empty;
 

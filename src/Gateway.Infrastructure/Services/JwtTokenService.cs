@@ -12,7 +12,6 @@ public class JwtTokenService : IJwtTokenService
 {
     private const string ConnectorIdClaimType = "ConnectorId";
     private const string BizDomainIdClaimType = "BizDomainId";
-    private const string ProviderClaimType = "Provider";
 
     private readonly string _issuer;
     private readonly string _audience;
@@ -46,8 +45,7 @@ public class JwtTokenService : IJwtTokenService
         var claims = new[]
         {
             new Claim(ConnectorIdClaimType, connector.Id.ToString()),
-            new Claim(BizDomainIdClaimType, connector.BizDomainId.ToString()),
-            new Claim(ProviderClaimType, connector.Provider.ToString())
+            new Claim(BizDomainIdClaimType, connector.BizDomainId.ToString())
         };
 
         var signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);

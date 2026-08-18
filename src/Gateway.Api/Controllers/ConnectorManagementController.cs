@@ -20,21 +20,13 @@ public class ConnectorManagementController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(ConnectorDto), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateAsync(
         CreateConnectorDto request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var connector = await _connectorManagementService.CreateAsync(request, cancellationToken);
+        var connector = await _connectorManagementService.CreateAsync(request, cancellationToken);
 
-            return CreatedAtAction(nameof(GetAsync), new { id = connector.Id }, connector);
-        }
-        catch (ConnectorAlreadyExistsException)
-        {
-            return Conflict();
-        }
+        return CreatedAtAction(nameof(GetAsync), new { id = connector.Id }, connector);
     }
 
     [HttpGet("{id:guid}")]

@@ -16,18 +16,13 @@ public class ConnectorEntityTypeConfiguration : IEntityTypeConfiguration<Connect
         builder.Property(connector => connector.BizDomainId)
             .IsRequired();
 
-        builder.Property(connector => connector.Provider)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
         builder.Property(connector => connector.ApiKey)
             .HasMaxLength(200)
             .IsRequired();
 
         builder.HasIndex(connector => connector.ApiKey).IsUnique();
 
-        builder.HasIndex(connector => new { connector.BizDomainId, connector.Provider }).IsUnique();
+        builder.HasIndex(connector => connector.BizDomainId).IsUnique();
 
         builder.Property(connector => connector.LoginTokenEncrypted)
             .HasMaxLength(500)

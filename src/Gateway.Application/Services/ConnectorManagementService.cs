@@ -53,12 +53,11 @@ public class ConnectorManagementService : IConnectorManagementService
 
     public async Task<ConnectorDto> CreateAsync(CreateConnectorDto request, CancellationToken cancellationToken)
     {
-        var existing = await _connectorRepository
-            .GetByBizDomainIdAndProviderAsync(request.BizDomainId, request.Provider, cancellationToken);
+        var existing = await _connectorRepository.GetByBizDomainIdAsync(request.BizDomainId, cancellationToken);
 
         if (existing is not null)
         {
-            throw new ConnectorAlreadyExistsException(request.BizDomainId, request.Provider);
+            return ToDto(existing, DecryptLoginToken(existing), DecryptAgentSecret(existing));
         }
 
         var now = DateTimeOffset.UtcNow;
@@ -69,7 +68,6 @@ public class ConnectorManagementService : IConnectorManagementService
         {
             Id = Guid.NewGuid(),
             BizDomainId = request.BizDomainId,
-            Provider = request.Provider,
             ApiKey = GenerateSecret("ak_"),
             LoginTokenEncrypted = _credentialEncryptionService.Encrypt(loginToken),
             AgentSecretEncrypted = _credentialEncryptionService.Encrypt(agentSecret),
@@ -103,11 +101,14 @@ public class ConnectorManagementService : IConnectorManagementService
 
     public async Task<IReadOnlyList<ConnectorDto>> ListByBizDomainIdAsync(Guid bizDomainId, CancellationToken cancellationToken)
     {
-        var connectors = await _connectorRepository.GetByBizDomainIdAsync(bizDomainId, cancellationToken);
+        var connector = await _connectorRepository.GetByBizDomainIdAsync(bizDomainId, cancellationToken);
 
-        return connectors
-            .Select(connector => ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector)))
-            .ToList();
+        if (connector is null)
+        {
+            return Array.Empty<ConnectorDto>();
+        }
+
+        return new[] { ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector)) };
     }
 
     public async Task<ConnectorDto> RotateLoginTokenAsync(Guid id, CancellationToken cancellationToken)
@@ -181,7 +182,6 @@ public class ConnectorManagementService : IConnectorManagementService
         return new ConnectorDto(
             connector.Id,
             connector.BizDomainId,
-            connector.Provider,
             connector.ApiKey,
             loginToken,
             agentSecret,
