@@ -23,6 +23,17 @@ public record AccountingResponseBase<TResult>
         };
     }
 
+    public static AccountingResponseBase<TResult> InvalidCredentials()
+    {
+        return new AccountingResponseBase<TResult>
+        {
+            Success = false,
+            ErrorCode = 401,
+            ErrorMessage = "Invalid accounting credentials",
+            Result = default
+        };
+    }
+
     private static int ParseErrorCode(string? errorCode)
     {
         return int.TryParse(errorCode, out var parsed) ? parsed : 0;
