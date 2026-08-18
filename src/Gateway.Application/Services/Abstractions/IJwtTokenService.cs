@@ -4,5 +4,5 @@ namespace Gateway.Application.Services.Abstractions;
 
 public interface IJwtTokenService
 {
-    string GenerateAgentToken(Connector connector);
+    string GenerateAgentToken(Connector connector, string agentProvider);
 }

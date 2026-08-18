@@ -12,6 +12,7 @@ public class JwtTokenService : IJwtTokenService
 {
     private const string ConnectorIdClaimType = "ConnectorId";
     private const string BizDomainIdClaimType = "BizDomainId";
+    private const string AgentProviderClaimType = "AgentProvider";
 
     private readonly string _issuer;
     private readonly string _audience;
@@ -38,14 +39,15 @@ public class JwtTokenService : IJwtTokenService
         _tokenLifetime = TimeSpan.FromMinutes(lifetimeInMinutes);
     }
 
-    public string GenerateAgentToken(Connector connector)
+    public string GenerateAgentToken(Connector connector, string agentProvider)
     {
         var now = DateTimeOffset.UtcNow;
 
         var claims = new[]
         {
             new Claim(ConnectorIdClaimType, connector.Id.ToString()),
-            new Claim(BizDomainIdClaimType, connector.BizDomainId.ToString())
+            new Claim(BizDomainIdClaimType, connector.BizDomainId.ToString()),
+            new Claim(AgentProviderClaimType, connector.BizDomainId.ToString())
         };
 
         var signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);

@@ -39,7 +39,7 @@ public class AgentAuthenticationService : IAgentAuthenticationService
             throw new InvalidAgentCredentialsException();
         }
 
-        var token = _jwtTokenService.GenerateAgentToken(connector);
+        var token = _jwtTokenService.GenerateAgentToken(connector, request.AgentProvider);
 
         return new AgentLoginResultDto(token);
     }

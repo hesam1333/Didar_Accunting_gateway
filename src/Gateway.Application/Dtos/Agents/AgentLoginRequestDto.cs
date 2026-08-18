@@ -1,3 +1,3 @@
 namespace Gateway.Application.Dtos.Agents;
 
-public record AgentLoginRequestDto(Guid ConnectorId, string AgentSecret);
+public record AgentLoginRequestDto(Guid ConnectorId, string AgentSecret,string AgentProvider);
