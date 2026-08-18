@@ -47,7 +47,7 @@ public class AgentHub : Hub
 
         if (connectorId is not null)
         {
-            _connectionRegistry.Unregister(connectorId.Value);
+            _connectionRegistry.Unregister(connectorId.Value, Context.ConnectionId);
             FailPendingCommands(connectorId.Value);
 
             _logger.LogInformation("Agent disconnected. ConnectorId={ConnectorId}, ConnectionId={ConnectionId}",
@@ -59,7 +59,13 @@ public class AgentHub : Hub
 
     public Task SubmitCommandResult(CommandResultEnvelope result)
     {
-        _pendingCommandRegistry.TryComplete(result.CommandId, result);
+        var connectorId = GetConnectorId();
+
+        if (connectorId is not null)
+        {
+            _pendingCommandRegistry.TryComplete(connectorId.Value, result.CommandId, result);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -83,7 +89,7 @@ public class AgentHub : Hub
         {
             if (pending.ConnectorId == connectorId)
             {
-                _pendingCommandRegistry.TryComplete(pending.CommandId, new CommandResultEnvelope(
+                _pendingCommandRegistry.TryComplete(connectorId, pending.CommandId, new CommandResultEnvelope(
                     pending.CommandId,
                     Success: false,
                     ErrorCode: "AgentDisconnected",

@@ -49,7 +49,7 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
             var envelope = new ConnectorCommandEnvelope(
                 command.CommandId,
                 command.CommandType,
-                command);
+                JsonSerializer.SerializeToElement(command, command.GetType()));
 
             using var timeoutCts = new CancellationTokenSource(_commandTimeout);
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);

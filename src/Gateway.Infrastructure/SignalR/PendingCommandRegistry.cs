@@ -14,9 +14,19 @@ public class PendingCommandRegistry
         }
     }
 
-    public bool TryComplete(Guid commandId, CommandResultEnvelope result)
+    public bool TryComplete(Guid connectorId, Guid commandId, CommandResultEnvelope result)
     {
-        if (!_pending.TryRemove(commandId, out var pendingCommand))
+        if (!_pending.TryGetValue(commandId, out var pendingCommand))
+        {
+            return false;
+        }
+
+        if (pendingCommand.ConnectorId != connectorId)
+        {
+            return false;
+        }
+
+        if (!_pending.TryRemove(commandId, out pendingCommand))
         {
             return false;
         }

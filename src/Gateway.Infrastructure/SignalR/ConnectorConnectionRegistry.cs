@@ -11,9 +11,10 @@ public class ConnectorConnectionRegistry
         _connections[connectorId] = connectionId;
     }
 
-    public void Unregister(Guid connectorId)
+    public void Unregister(Guid connectorId, string connectionId)
     {
-        _connections.TryRemove(connectorId, out _);
+        var entry = new KeyValuePair<Guid, string>(connectorId, connectionId);
+        ((ICollection<KeyValuePair<Guid, string>>)_connections).Remove(entry);
     }
 
     public bool TryGetConnectionId(Guid connectorId, out string? connectionId)
