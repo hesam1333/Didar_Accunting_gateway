@@ -109,16 +109,38 @@ public class SignalRConnectorCommandDispatcher : IConnectorCommandDispatcher
             return default;
         }
 
-        if (data is TData typed)
+        if (data is TData typed && data is not JsonElement)
         {
             return typed;
         }
 
         if (data is JsonElement element)
         {
-            return element.Deserialize<TData>();
+            return JsonSerializer.Deserialize<TData>(
+                element.GetRawText(),
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
         }
 
-        return (TData)data;
+        if (data is string json)
+        {
+            return JsonSerializer.Deserialize<TData>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+        }
+
+        var serialized = JsonSerializer.Serialize(data);
+
+        return JsonSerializer.Deserialize<TData>(
+            serialized,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gateway.Api.Controllers;
 
 [ApiController]
-[Route("{provider}/v1")]
+[Route("/v1")]
 public class AccountingController : ControllerBase
 {
     private readonly IAccountingService _accountingService;

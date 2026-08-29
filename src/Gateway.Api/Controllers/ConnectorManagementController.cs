@@ -26,7 +26,7 @@ public class ConnectorManagementController : ControllerBase
     {
         var connector = await _connectorManagementService.CreateAsync(request, cancellationToken);
 
-        return CreatedAtAction(nameof(GetAsync), new { id = connector.Id }, connector);
+        return Ok(connector);
     }
 
     [HttpGet("{id:guid}")]
