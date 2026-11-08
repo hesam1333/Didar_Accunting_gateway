@@ -29,7 +29,7 @@ public record AccountingResponseBase<TResult>
         {
             Success = false,
             ErrorCode = 401,
-            ErrorMessage = "Invalid accounting credentials",
+            ErrorMessage = "اطلاعات احراز هویت حسابداری معتبر نیست. لطفاً ApiKey، LoginToken و ارائه‌دهنده را بررسی کنید.",
             Result = default
         };
     }
@@ -41,6 +41,17 @@ public record AccountingResponseBase<TResult>
             Success = false,
             ErrorCode = 403,
             ErrorMessage = Exceptions.ConnectorExpiredException.ErrorMessage,
+            Result = default
+        };
+    }
+
+    public static AccountingResponseBase<TResult> Failed(int errorCode, string errorMessage)
+    {
+        return new AccountingResponseBase<TResult>
+        {
+            Success = false,
+            ErrorCode = errorCode,
+            ErrorMessage = errorMessage,
             Result = default
         };
     }

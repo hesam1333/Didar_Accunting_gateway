@@ -21,219 +21,163 @@ public class AccountingController : ControllerBase
     [ProducesResponseType(typeof(AccountingResponseBase<BusinessInfoResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBusinessInfoAsync(GetBusinessInfoRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.GetBusinessInfoAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.GetBusinessInfoAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<BusinessInfoResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<BusinessInfoResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("setting/GetProjects")]
     [ProducesResponseType(typeof(AccountingResponseBase<IReadOnlyList<ProjectResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProjectsAsync(GetProjectsRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.GetProjectsAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.GetProjectsAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<IReadOnlyList<ProjectResponse>>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<IReadOnlyList<ProjectResponse>>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("contact/get")]
     [ProducesResponseType(typeof(AccountingResponseBase<ContactResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetContactAsync(GetContactRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.GetContactAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.GetContactAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<ContactResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<ContactResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("contact/getcontacts")]
     [ProducesResponseType(typeof(AccountingResponseBase<PaginationResponse<ContactResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchContactsAsync(SearchContactsRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.SearchContactsAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.SearchContactsAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<PaginationResponse<ContactResponse>>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<PaginationResponse<ContactResponse>>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("contact/save")]
     [ProducesResponseType(typeof(AccountingResponseBase<ContactResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SaveContactAsync(SaveContactRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.SaveContactAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.SaveContactAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<ContactResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<ContactResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("invoice/get")]
     [ProducesResponseType(typeof(AccountingResponseBase<InvoiceResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInvoiceAsync(GetInvoiceRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.GetInvoiceAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.GetInvoiceAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<InvoiceResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<InvoiceResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("invoice/save")]
     [ProducesResponseType(typeof(AccountingResponseBase<InvoiceResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SaveInvoiceAsync(SaveInvoiceRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.SaveInvoiceAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.SaveInvoiceAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<InvoiceResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<InvoiceResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("invoice/delete")]
     [ProducesResponseType(typeof(AccountingResponseBase<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteInvoiceAsync(DeleteInvoiceRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.DeleteInvoiceAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.DeleteInvoiceAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<bool>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<bool>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("item/get")]
     [ProducesResponseType(typeof(AccountingResponseBase<ItemResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.GetItemAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.GetItemAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<ItemResponse>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<ItemResponse>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("item/getitems")]
     [ProducesResponseType(typeof(AccountingResponseBase<PaginationResponse<ItemResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchItemsAsync(SearchItemsRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _accountingService.SearchItemsAsync(request, cancellationToken);
+        var response = await ExecuteAsync(
+            () => _accountingService.SearchItemsAsync(request, cancellationToken),
+            cancellationToken);
 
-            return Ok(response);
-        }
-        catch (ConnectorExpiredException)
-        {
-            return Ok(AccountingResponseBase<PaginationResponse<ItemResponse>>.ConnectorExpired());
-        }
-        catch (InvalidConnectorCredentialsException)
-        {
-            return Ok(AccountingResponseBase<PaginationResponse<ItemResponse>>.InvalidCredentials());
-        }
+        return Ok(response);
     }
 
     [HttpPost("item/batchsave")]
     [ProducesResponseType(typeof(AccountingResponseBase<IReadOnlyList<ItemResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> BatchSaveItemsAsync(BatchSaveItemsRequest request, CancellationToken cancellationToken)
     {
+        var response = await ExecuteAsync(
+            () => _accountingService.BatchSaveItemsAsync(request, cancellationToken),
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    private static async Task<AccountingResponseBase<TResult>> ExecuteAsync<TResult>(
+        Func<Task<AccountingResponseBase<TResult>>> action,
+        CancellationToken cancellationToken)
+    {
         try
         {
-            var response = await _accountingService.BatchSaveItemsAsync(request, cancellationToken);
-
-            return Ok(response);
+            return await action();
         }
         catch (ConnectorExpiredException)
         {
-            return Ok(AccountingResponseBase<IReadOnlyList<ItemResponse>>.ConnectorExpired());
+            return AccountingResponseBase<TResult>.ConnectorExpired();
         }
         catch (InvalidConnectorCredentialsException)
         {
-            return Ok(AccountingResponseBase<IReadOnlyList<ItemResponse>>.InvalidCredentials());
+            return AccountingResponseBase<TResult>.InvalidCredentials();
+        }
+        catch (CommandDispatchException exception)
+        {
+            return exception.ErrorCode switch
+            {
+                "AgentNotConnected" => AccountingResponseBase<TResult>.Failed(
+                    StatusCodes.Status503ServiceUnavailable,
+                    "ارتباط با نرم‌افزار حسابداری برقرار نیست."),
+                "CommandTimeout" => AccountingResponseBase<TResult>.Failed(
+                    StatusCodes.Status504GatewayTimeout,
+                    "نرم‌افزار حسابداری در زمان تعیین‌شده پاسخی ارسال نکرد."),
+                _ => AccountingResponseBase<TResult>.Failed(
+                    StatusCodes.Status503ServiceUnavailable,
+                    "هنگام ارتباط با نرم‌افزار حسابداری خطایی رخ داد.")
+            };
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return AccountingResponseBase<TResult>.Failed(
+                StatusCodes.Status500InternalServerError,
+                "هنگام پردازش درخواست خطای غیرمنتظره‌ای رخ داد.");
         }
     }
 }
