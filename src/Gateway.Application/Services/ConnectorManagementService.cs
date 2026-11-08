@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Gateway.Application.Configuration;
 using Gateway.Application.Dtos.Accounting.Requests;
 using Gateway.Application.Dtos.Connectors;
 using Gateway.Application.Exceptions;
@@ -13,13 +14,16 @@ public class ConnectorManagementService : IConnectorManagementService
 {
     private readonly IConnectorRepository _connectorRepository;
     private readonly ICredentialEncryptionService _credentialEncryptionService;
+    private readonly ConnectorExpirationOptions _expirationOptions;
 
     public ConnectorManagementService(
         IConnectorRepository connectorRepository,
-        ICredentialEncryptionService credentialEncryptionService)
+        ICredentialEncryptionService credentialEncryptionService,
+        ConnectorExpirationOptions expirationOptions)
     {
         _connectorRepository = connectorRepository;
         _credentialEncryptionService = credentialEncryptionService;
+        _expirationOptions = expirationOptions;
     }
 
     public async Task<Guid> AuthenticateAsync(AccountingRequestBase request, CancellationToken cancellationToken)
@@ -46,6 +50,13 @@ public class ConnectorManagementService : IConnectorManagementService
         if (!SecretsMatch(request.LoginToken, expectedLoginToken))
         {
             throw new InvalidConnectorCredentialsException();
+        }
+
+        var expiresAt = connector.ExpiredAt ?? connector.CreatedAt.AddDays(_expirationOptions.TrialDays);
+
+        if (DateTimeOffset.UtcNow >= expiresAt)
+        {
+            throw new ConnectorExpiredException();
         }
 
         return connector.Id;
@@ -161,6 +172,21 @@ public class ConnectorManagementService : IConnectorManagementService
         return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
     }
 
+    public async Task<ConnectorDto> UpdateExpirationAsync(
+        Guid id,
+        DateTimeOffset? expiredAt,
+        CancellationToken cancellationToken)
+    {
+        var connector = await GetRequiredConnectorAsync(id, cancellationToken);
+
+        connector.ExpiredAt = expiredAt;
+        connector.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _connectorRepository.UpdateAsync(connector, cancellationToken);
+
+        return ToDto(connector, DecryptLoginToken(connector), DecryptAgentSecret(connector));
+    }
+
     private async Task<Connector> GetRequiredConnectorAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _connectorRepository.GetByIdAsync(id, cancellationToken)
@@ -187,6 +213,7 @@ public class ConnectorManagementService : IConnectorManagementService
             agentSecret,
             connector.IsActive,
             connector.CreatedAt,
+            connector.ExpiredAt,
             connector.LastAgentSeenAt);
     }
 

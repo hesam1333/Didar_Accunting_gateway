@@ -25,7 +25,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddDbContext<AccountingGatewayDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("GatewayDatabase")));
+            options.UseSqlite(configuration.GetConnectionString("GatewayDatabase")));
 
         services.AddScoped<ConnectorManagementSecretFilter>();
 

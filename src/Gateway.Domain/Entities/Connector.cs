@@ -18,6 +18,8 @@ public class Connector
 
     public DateTimeOffset UpdatedAt { get; set; }
 
+    public DateTimeOffset? ExpiredAt { get; set; }
+
     public DateTimeOffset? LastAgentConnectedAt { get; set; }
 
     public DateTimeOffset? LastAgentSeenAt { get; set; }

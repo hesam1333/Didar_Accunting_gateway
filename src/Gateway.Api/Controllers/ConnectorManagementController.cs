@@ -134,4 +134,27 @@ public class ConnectorManagementController : ControllerBase
             return NotFound();
         }
     }
+
+    [HttpPut("{id:guid}/expired-at")]
+    [ProducesResponseType(typeof(ConnectorDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateExpirationAsync(
+        Guid id,
+        UpdateConnectorExpirationDto request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var connector = await _connectorManagementService.UpdateExpirationAsync(
+                id,
+                request.ExpiredAt,
+                cancellationToken);
+
+            return Ok(connector);
+        }
+        catch (ConnectorNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }

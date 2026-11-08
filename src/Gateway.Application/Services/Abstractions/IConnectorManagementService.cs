@@ -23,4 +23,6 @@ public interface IConnectorManagementService
     Task<ConnectorDto> EnableAsync(Guid id, CancellationToken cancellationToken);
 
     Task<ConnectorDto> DisableAsync(Guid id, CancellationToken cancellationToken);
+
+    Task<ConnectorDto> UpdateExpirationAsync(Guid id, DateTimeOffset? expiredAt, CancellationToken cancellationToken);
 }

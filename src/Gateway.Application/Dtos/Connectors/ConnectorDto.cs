@@ -8,4 +8,5 @@ public record ConnectorDto(
     string AgentSecret,
     bool IsActive,
     DateTimeOffset CreatedAt,
+    DateTimeOffset? ExpiredAt,
     DateTimeOffset? LastAgentSeenAt);

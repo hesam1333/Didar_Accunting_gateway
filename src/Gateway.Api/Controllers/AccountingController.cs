@@ -27,6 +27,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<BusinessInfoResponse>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<BusinessInfoResponse>.InvalidCredentials());
@@ -42,6 +46,10 @@ public class AccountingController : ControllerBase
             var response = await _accountingService.GetProjectsAsync(request, cancellationToken);
 
             return Ok(response);
+        }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<IReadOnlyList<ProjectResponse>>.ConnectorExpired());
         }
         catch (InvalidConnectorCredentialsException)
         {
@@ -59,6 +67,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<ContactResponse>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<ContactResponse>.InvalidCredentials());
@@ -74,6 +86,10 @@ public class AccountingController : ControllerBase
             var response = await _accountingService.SearchContactsAsync(request, cancellationToken);
 
             return Ok(response);
+        }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<PaginationResponse<ContactResponse>>.ConnectorExpired());
         }
         catch (InvalidConnectorCredentialsException)
         {
@@ -91,6 +107,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<ContactResponse>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<ContactResponse>.InvalidCredentials());
@@ -106,6 +126,10 @@ public class AccountingController : ControllerBase
             var response = await _accountingService.GetInvoiceAsync(request, cancellationToken);
 
             return Ok(response);
+        }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<InvoiceResponse>.ConnectorExpired());
         }
         catch (InvalidConnectorCredentialsException)
         {
@@ -123,6 +147,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<InvoiceResponse>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<InvoiceResponse>.InvalidCredentials());
@@ -138,6 +166,10 @@ public class AccountingController : ControllerBase
             var response = await _accountingService.DeleteInvoiceAsync(request, cancellationToken);
 
             return Ok(response);
+        }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<bool>.ConnectorExpired());
         }
         catch (InvalidConnectorCredentialsException)
         {
@@ -155,6 +187,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<ItemResponse>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<ItemResponse>.InvalidCredentials());
@@ -171,6 +207,10 @@ public class AccountingController : ControllerBase
 
             return Ok(response);
         }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<PaginationResponse<ItemResponse>>.ConnectorExpired());
+        }
         catch (InvalidConnectorCredentialsException)
         {
             return Ok(AccountingResponseBase<PaginationResponse<ItemResponse>>.InvalidCredentials());
@@ -186,6 +226,10 @@ public class AccountingController : ControllerBase
             var response = await _accountingService.BatchSaveItemsAsync(request, cancellationToken);
 
             return Ok(response);
+        }
+        catch (ConnectorExpiredException)
+        {
+            return Ok(AccountingResponseBase<IReadOnlyList<ItemResponse>>.ConnectorExpired());
         }
         catch (InvalidConnectorCredentialsException)
         {

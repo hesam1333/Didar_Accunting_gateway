@@ -40,5 +40,7 @@ public class ConnectorEntityTypeConfiguration : IEntityTypeConfiguration<Connect
 
         builder.Property(connector => connector.UpdatedAt)
             .IsRequired();
+
+        builder.Property(connector => connector.ExpiredAt);
     }
 }
