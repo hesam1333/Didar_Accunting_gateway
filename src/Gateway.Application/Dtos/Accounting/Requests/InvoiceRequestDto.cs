@@ -10,9 +10,9 @@ public record InvoiceRequestDto
 
     public DateTime DueDate { get; init; }
 
-    public string ContactCode { get; init; } = string.Empty;
+    public string? ContactCode { get; init; } = string.Empty;
 
-    public string ContactTitle { get; init; } = string.Empty;
+    public string? ContactTitle { get; init; } = string.Empty;
 
     public string? Note { get; init; }
 
@@ -28,9 +28,9 @@ public record InvoiceRequestDto
 
     public int WarehouseReceiptStatus { get; init; }
 
-    public string Project { get; init; } = string.Empty;
+    public string? Project { get; init; } = string.Empty;
 
-    public string SalesmanCode { get; init; } = string.Empty;
+    public string? SalesmanCode { get; init; } = string.Empty;
 
     public double? SalesmanPercent { get; init; }
 
@@ -38,7 +38,7 @@ public record InvoiceRequestDto
 
     public IReadOnlyList<OtherCostDto> Others { get; init; } = new List<OtherCostDto>();
 
-    public string Currency { get; init; } = string.Empty;
+    public string? Currency { get; init; } = string.Empty;
 
     public decimal CurrencyRate { get; init; }
 }
