@@ -67,7 +67,7 @@ public class AccountingService : IAccountingService
     {
         var connectorId = await _connectorManagementService.AuthenticateAsync(request, cancellationToken);
 
-        var result = await _commandDispatcher.DispatchAsync<InvoiceResponse>(connectorId, new GetInvoiceCommand(request.Number, request.Type), cancellationToken);
+        var result = await _commandDispatcher.DispatchAsync<InvoiceResponse>(connectorId, new GetInvoiceCommand(request.Number, request.Type, request.Status), cancellationToken);
 
         return AccountingResponseBase<InvoiceResponse>.FromCommandResult(result);
     }
